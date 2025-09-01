@@ -19,4 +19,16 @@ public class UserHandler implements IUserHandler {
         User userEntity = userDTOMapper.toEntity(userDTO);
         userServicePort.createOwner(userEntity);
     }
+
+    @Override
+    public void createEmployee(UserDTO userDTO) {
+        User userEntity = userDTOMapper.toEntity(userDTO);
+        userServicePort.createEmployee(userEntity);
+    }
+
+    @Override
+    public void createClient(UserDTO userDTO) {
+        User userEntity = userDTOMapper.toEntity(userDTO);
+        userServicePort.createClient(userEntity);
+    }
 }

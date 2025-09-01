@@ -24,13 +24,32 @@ public class UserService implements IUserServicePort {
     @Override
     public void createOwner(User userEntity) {
         userEntity.setPassword(passwordServicePort.encodePassword(userEntity.getPassword()));
+        validateUser(userEntity, true);
+        userPersistencePort.saveUser(userEntity, "OWNER");
+    }
+
+    @Override
+    public void createEmployee(User userEntity) {
+        userEntity.setPassword(passwordServicePort.encodePassword(userEntity.getPassword()));
+        validateUser(userEntity, false);
+        userPersistencePort.saveUser(userEntity, "EMPLOYEE");
+    }
+
+    @Override
+    public void createClient(User userEntity) {
+        userEntity.setPassword(passwordServicePort.encodePassword(userEntity.getPassword()));
+        validateUser(userEntity, false);
+        userPersistencePort.saveUser(userEntity, "CLIENT");
+    }
+
+    private void validateUser(User userEntity, boolean validateAge) {
         if (!validateCellphone(userEntity.getPhoneNumber())) {
             throw new IllegalArgumentException("Invalid cellphone number");
         }
         if (!validateDocument(userEntity.getIdentificationNumber())) {
             throw new IllegalArgumentException("Invalid document number");
         }
-        if (Period.between(userEntity.getBirthDate(), LocalDate.now()).getYears() < 18) {
+        if (validateAge && Period.between(userEntity.getBirthDate(), LocalDate.now()).getYears() < 18) {
             throw new IllegalArgumentException("User must be at least 18 years old");
         }
         if (userPersistencePort.findByEmail(userEntity.getEmail()).isPresent()) {
@@ -39,8 +58,5 @@ public class UserService implements IUserServicePort {
         if (userPersistencePort.findByPhoneNumber(userEntity.getPhoneNumber()).isPresent()) {
             throw new IllegalArgumentException("Phone number already exists");
         }
-        userPersistencePort.saveUser(userEntity, "OWNER");
-
-
     }
 }
