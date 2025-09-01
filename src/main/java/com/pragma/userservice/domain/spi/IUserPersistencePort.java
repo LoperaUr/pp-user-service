@@ -9,5 +9,5 @@ public interface IUserPersistencePort {
 
     Optional<User> findByPhoneNumber(String phoneNumber);
 
-    void saveUser(User userEntity, String owner);
+    void saveUser(User userEntity, String role);
 }

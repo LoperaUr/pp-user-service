@@ -28,4 +28,16 @@ public class UserController {
         userHandler.createOwner(userDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+    @PostMapping("/employee")
+    public ResponseEntity<Void> createEmployee(@Valid @RequestBody UserDTO userDTO) {
+        userHandler.createEmployee(userDTO);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/client")
+    public ResponseEntity<Void> createClient(@Valid @RequestBody UserDTO userDTO) {
+        userHandler.createClient(userDTO);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 }
