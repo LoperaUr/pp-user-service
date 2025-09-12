@@ -1,5 +1,6 @@
 package com.pragma.userservice.infraestructure.output.jpa.adapter;
 
+import com.pragma.userservice.domain.model.Role;
 import com.pragma.userservice.domain.model.User;
 import com.pragma.userservice.domain.spi.IUserPersistencePort;
 import com.pragma.userservice.infraestructure.output.jpa.entity.UserEntity;
@@ -19,18 +20,26 @@ public class UserJpaAdapter implements IUserPersistencePort {
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmail(email)
+                .map(userEntityMapper::toDomain);
     }
 
     @Override
     public Optional<User> findByPhoneNumber(String phoneNumber) {
-        return userRepository.findByPhoneNumber(phoneNumber);
+        return userRepository.findByPhoneNumber(phoneNumber)
+                .map(userEntityMapper::toDomain);
     }
 
     @Override
-    public void saveUser(User user, String role) {
+    public void saveUser(User user, Role role) {
         UserEntity entity = userEntityMapper.toEntity(user);
         entity.setRole(role);
         userRepository.save(entity);
+    }
+
+    @Override
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id)
+                .map(userEntityMapper::toDomain);
     }
 }

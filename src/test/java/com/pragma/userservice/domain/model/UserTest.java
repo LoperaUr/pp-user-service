@@ -21,6 +21,7 @@ class UserTest {
         user.setBirthDate(birth);
         user.setEmail("john@example.com");
         user.setPassword("secret");
+        user.setRole(Role.CLIENT);
 
         assertEquals(1L, user.getId());
         assertEquals("John", user.getName());
@@ -30,12 +31,13 @@ class UserTest {
         assertEquals(birth, user.getBirthDate());
         assertEquals("john@example.com", user.getEmail());
         assertEquals("secret", user.getPassword());
+        assertEquals(Role.CLIENT, user.getRole());
     }
 
     @Test
     void allArgsConstructorAssignsFields() {
         LocalDate birth = LocalDate.now();
-        User user = new User(1L, "Jane", "Smith", "654321", "+573111111111", birth, "jane@example.com", "pwd");
+        User user = new User(1L, "Jane", "Smith", "654321", "+573111111111", birth, "jane@example.com", "pwd", Role.OWNER);
 
         assertEquals(1L, user.getId());
         assertEquals("Jane", user.getName());
@@ -45,5 +47,6 @@ class UserTest {
         assertEquals(birth, user.getBirthDate());
         assertEquals("jane@example.com", user.getEmail());
         assertEquals("pwd", user.getPassword());
+        assertEquals(Role.OWNER, user.getRole());
     }
 }

@@ -9,4 +9,6 @@ public interface IUserHandler {
     void createEmployee(@Valid UserDTO userDTO);
 
     void createClient(@Valid UserDTO userDTO);
+
+    UserDTO getUserById(Long id);
 }

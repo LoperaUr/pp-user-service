@@ -8,4 +8,6 @@ public interface IUserServicePort {
     void createEmployee(User userEntity);
 
     void createClient(User userEntity);
+
+    User getUserById(Long id);
 }
