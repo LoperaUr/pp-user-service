@@ -1,47 +1,19 @@
-# Multi-stage build for optimal image size
-FROM eclipse-temurin:21-jdk-alpine AS builder
+# Dockerfile simplificado para Spring Boot con Gradle
+FROM eclipse-temurin:21-jdk-alpine
 
 WORKDIR /app
 
-# Copy gradle wrapper and build files
-COPY gradlew .
-COPY gradle gradle
-COPY build.gradle .
-COPY settings.gradle .
+# Copiar todo el proyecto
+COPY . .
 
-# Download dependencies (cached layer)
-RUN ./gradlew dependencies --no-daemon
-
-# Copy source code
-COPY src src
-
-# Build application
+# Construir el jar
 RUN ./gradlew bootJar --no-daemon
 
-# Runtime stage
+# Usar JRE para correr la app
 FROM eclipse-temurin:21-jre-alpine
-
 WORKDIR /app
+COPY --from=0 /app/build/libs/*.jar app.jar
 
-# Create non-root user for security
-RUN addgroup -g 1001 -S appgroup && \
-    adduser -u 1001 -S appuser -G appgroup
-
-# Copy jar from builder stage
-COPY --from=builder /app/build/libs/*.jar app.jar
-
-# Change ownership to non-root user
-RUN chown appuser:appgroup app.jar
-
-# Switch to non-root user
-USER appuser
-
-# Expose port
 EXPOSE 8081
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8081/actuator/health || exit 1
-
-# Run application
 ENTRYPOINT ["java", "-jar", "app.jar"]
