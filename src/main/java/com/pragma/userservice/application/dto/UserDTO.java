@@ -1,5 +1,6 @@
 package com.pragma.userservice.application.dto;
 
+import com.pragma.userservice.application.constants.ApplicationConstants;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,26 +17,26 @@ public class UserDTO {
 
     private Long id;
 
-    @NotBlank(message = "Name cannot be blank")
+    @NotBlank(message = ApplicationConstants.NAME_CANNOT_BE_BLANK)
     private String name;
 
-    @NotBlank(message = "Last name cannot be blank")
+    @NotBlank(message = ApplicationConstants.LAST_NAME_CANNOT_BE_BLANK)
     private String lastName;
 
-    @NotBlank(message = "Identification number cannot be blank")
+    @NotBlank(message = ApplicationConstants.IDENTIFICATION_NUMBER_CANNOT_BE_BLANK)
     private String identificationNumber;
 
-    @NotBlank(message = "Phone number cannot be blank")
+    @NotBlank(message = ApplicationConstants.PHONE_NUMBER_CANNOT_BE_BLANK)
     private String phoneNumber;
 
-    @NotNull(message = "Birth date cannot be null")
+    @NotNull(message = ApplicationConstants.BIRTH_DATE_CANNOT_BE_NULL)
     private LocalDate birthDate;
 
-    @Email(message = "Email should be valid")
-    @NotBlank(message = "Email cannot be blank")
+    @Email(message = ApplicationConstants.EMAIL_SHOULD_BE_VALID)
+    @NotBlank(message = ApplicationConstants.EMAIL_CANNOT_BE_BLANK)
     private String email;
 
-    @NotBlank(message = "Password cannot be blank")
+    @NotBlank(message = ApplicationConstants.PASSWORD_CANNOT_BE_BLANK)
     private String password;
 
 }

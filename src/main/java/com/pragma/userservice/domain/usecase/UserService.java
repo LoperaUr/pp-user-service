@@ -5,7 +5,7 @@ import com.pragma.userservice.domain.api.IUserServicePort;
 import com.pragma.userservice.domain.model.Role;
 import com.pragma.userservice.domain.model.User;
 import com.pragma.userservice.domain.spi.IUserPersistencePort;
-import lombok.RequiredArgsConstructor;
+import com.pragma.userservice.domain.constants.DomainConstants;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -13,11 +13,8 @@ import java.time.Period;
 import static com.pragma.userservice.infraestructure.util.UserValidator.validateCellphone;
 import static com.pragma.userservice.infraestructure.util.UserValidator.validateDocument;
 
-@RequiredArgsConstructor
-public class UserService implements IUserServicePort {
-
-    private final IUserPersistencePort userPersistencePort;
-    private final IPasswordServicePort passwordServicePort;
+public record UserService(IUserPersistencePort userPersistencePort,
+                          IPasswordServicePort passwordServicePort) implements IUserServicePort {
 
     @Override
     public void createOwner(User userEntity) {
@@ -43,26 +40,26 @@ public class UserService implements IUserServicePort {
     @Override
     public User getUserById(Long id) {
         User user = userPersistencePort.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException(DomainConstants.MSG_USER_NOT_FOUND));
         user.setPassword(null);
         return user;
     }
 
     private void validateUser(User userEntity, boolean validateAge) {
         if (!validateCellphone(userEntity.getPhoneNumber())) {
-            throw new IllegalArgumentException("Invalid cellphone number");
+            throw new IllegalArgumentException(DomainConstants.MSG_INVALID_CELLPHONE);
         }
         if (!validateDocument(userEntity.getIdentificationNumber())) {
-            throw new IllegalArgumentException("Invalid document number");
+            throw new IllegalArgumentException(DomainConstants.MSG_INVALID_DOCUMENT);
         }
         if (validateAge && Period.between(userEntity.getBirthDate(), LocalDate.now()).getYears() < 18) {
-            throw new IllegalArgumentException("User must be at least 18 years old");
+            throw new IllegalArgumentException(DomainConstants.MSG_UNDERAGE_USER);
         }
         if (userPersistencePort.findByEmail(userEntity.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new IllegalArgumentException(DomainConstants.MSG_EMAIL_ALREADY_EXISTS);
         }
         if (userPersistencePort.findByPhoneNumber(userEntity.getPhoneNumber()).isPresent()) {
-            throw new IllegalArgumentException("Phone number already exists");
+            throw new IllegalArgumentException(DomainConstants.MSG_PHONE_ALREADY_EXISTS);
         }
     }
 }
