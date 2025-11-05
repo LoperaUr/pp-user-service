@@ -1,6 +1,7 @@
 package com.pragma.userservice.application.dto;
 
 import com.pragma.userservice.application.constants.ApplicationConstants;
+import com.pragma.userservice.domain.model.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -38,5 +39,7 @@ public class UserDTO {
 
     @NotBlank(message = ApplicationConstants.PASSWORD_CANNOT_BE_BLANK)
     private String password;
+
+    private Role role;
 
 }
