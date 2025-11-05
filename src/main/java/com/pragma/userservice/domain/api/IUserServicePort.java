@@ -1,5 +1,6 @@
 package com.pragma.userservice.domain.api;
 
+import com.pragma.userservice.domain.model.Auth;
 import com.pragma.userservice.domain.model.User;
 
 public interface IUserServicePort {
@@ -10,4 +11,6 @@ public interface IUserServicePort {
     void createClient(User userEntity);
 
     User getUserById(Long id);
+
+    Auth login(Auth authEntity);
 }

@@ -11,5 +11,6 @@ public final class DomainConstants {
     public static final String MSG_UNDERAGE_USER = "User must be at least 18 years old";
     public static final String MSG_EMAIL_ALREADY_EXISTS = "Email already exists";
     public static final String MSG_PHONE_ALREADY_EXISTS = "Phone number already exists";
+    public static final String MSG_INVALID_CREDENTIALS = "Invalid credentials";
 
 }

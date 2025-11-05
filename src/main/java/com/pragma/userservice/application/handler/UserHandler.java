@@ -1,8 +1,11 @@
 package com.pragma.userservice.application.handler;
 
+import com.pragma.userservice.application.dto.AuthDTO;
 import com.pragma.userservice.application.dto.UserDTO;
+import com.pragma.userservice.application.mapper.IAuthMapper;
 import com.pragma.userservice.application.mapper.IUserMapper;
 import com.pragma.userservice.domain.api.IUserServicePort;
+import com.pragma.userservice.domain.model.Auth;
 import com.pragma.userservice.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class UserHandler implements IUserHandler {
 
     private final IUserMapper userDTOMapper;
+    private final IAuthMapper authMapper;
     private final IUserServicePort userServicePort;
 
     @Override
@@ -36,5 +40,12 @@ public class UserHandler implements IUserHandler {
     public UserDTO getUserById(Long id) {
         User user = userServicePort.getUserById(id);
         return userDTOMapper.toDto(user);
+    }
+
+    @Override
+    public AuthDTO login(AuthDTO authDTO) {
+        Auth authEntity = authMapper.toEntity(authDTO);
+        Auth result = userServicePort.login(authEntity);
+        return authMapper.toDto(result);
     }
 }

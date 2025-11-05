@@ -2,6 +2,7 @@ package com.pragma.userservice.infraestructure.configuration;
 
 import com.pragma.userservice.domain.api.IUserServicePort;import com.pragma.userservice.domain.spi.IUserPersistencePort;
 import com.pragma.userservice.domain.usecase.UserService;
+import com.pragma.userservice.infraestructure.output.security.adapter.JwtServiceAdapter;
 import com.pragma.userservice.infraestructure.output.security.adapter.PasswordServiceAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +27,12 @@ public class BeanConfiguration {
     }
 
     @Bean
+    public JwtServiceAdapter jwtServiceAdapter() {
+        return new JwtServiceAdapter();
+    }
+
+    @Bean
     public IUserServicePort userServicePort(PasswordServiceAdapter passwordServiceAdapter) {
-        return new UserService(userPersistencePort, passwordServiceAdapter);
+        return new UserService(userPersistencePort, passwordServiceAdapter, jwtServiceAdapter());
     }
 }

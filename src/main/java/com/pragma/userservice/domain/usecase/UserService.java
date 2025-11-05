@@ -1,7 +1,9 @@
 package com.pragma.userservice.domain.usecase;
 
 import com.pragma.userservice.domain.api.IPasswordServicePort;
+import com.pragma.userservice.domain.api.ITokenServicePort;
 import com.pragma.userservice.domain.api.IUserServicePort;
+import com.pragma.userservice.domain.model.Auth;
 import com.pragma.userservice.domain.model.Role;
 import com.pragma.userservice.domain.model.User;
 import com.pragma.userservice.domain.spi.IUserPersistencePort;
@@ -14,7 +16,9 @@ import static com.pragma.userservice.infraestructure.util.UserValidator.validate
 import static com.pragma.userservice.infraestructure.util.UserValidator.validateDocument;
 
 public record UserService(IUserPersistencePort userPersistencePort,
-                          IPasswordServicePort passwordServicePort) implements IUserServicePort {
+                          IPasswordServicePort passwordServicePort,
+                          ITokenServicePort tokenServicePort
+                          ) implements IUserServicePort {
 
     @Override
     public void createOwner(User userEntity) {
@@ -43,6 +47,25 @@ public record UserService(IUserPersistencePort userPersistencePort,
                 .orElseThrow(() -> new IllegalArgumentException(DomainConstants.MSG_USER_NOT_FOUND));
         user.setPassword(null);
         return user;
+    }
+
+    @Override
+    public Auth login(Auth auth) {
+        User user = userPersistencePort.findByEmail(auth.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException(DomainConstants.MSG_USER_NOT_FOUND));
+
+        if (!passwordServicePort.matches(auth.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException(DomainConstants.MSG_INVALID_CREDENTIALS);
+        }
+
+        return setTokenProperties(auth, user);
+    }
+
+    private Auth setTokenProperties(Auth auth, User user) {
+        auth.setToken(tokenServicePort.generateToken(user.getEmail()));
+        auth.setPassword(null);
+        auth.setEmail(null);
+        return auth;
     }
 
     private void validateUser(User userEntity, boolean validateAge) {
