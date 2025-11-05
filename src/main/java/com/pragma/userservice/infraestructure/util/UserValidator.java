@@ -2,13 +2,25 @@ package com.pragma.userservice.infraestructure.util;
 
 public class UserValidator {
 
+    // Prevent instantiation
+    private UserValidator() {}
+
+    // Regex patterns
+    private static final String CELLPHONE_PATTERN = "^\\+?\\d{3,}$";
+    private static final String DOCUMENT_PATTERN = "^\\d{3,}$";
+
     public static boolean validateCellphone(String cellphone) {
-        // Verifica que el celular no sea nulo, tenga al menos 3 caracteres y solo contenga dígitos o el símbolo +
-        return cellphone != null && cellphone.matches("^\\+?[0-9]{2,}$");
+        if (cellphone == null) return false;
+        String value = cellphone.trim();
+        if (value.isEmpty()) return false;
+        return value.matches(CELLPHONE_PATTERN);
     }
 
+
     public static boolean validateDocument(String document) {
-        // Verifica que el documento no sea nulo, tenga al menos 3 caracteres y solo contenga dígitos
-        return document != null && document.matches("^[0-9]{3,}$");
+        if (document == null) return false;
+        String value = document.trim();
+        if (value.isEmpty()) return false;
+        return value.matches(DOCUMENT_PATTERN);
     }
 }

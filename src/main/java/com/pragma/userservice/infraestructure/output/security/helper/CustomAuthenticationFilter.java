@@ -1,11 +1,13 @@
 package com.pragma.userservice.infraestructure.output.security.helper;
 
+import com.pragma.userservice.domain.constants.DomainConstants;
 import com.pragma.userservice.infraestructure.output.security.adapter.JwtServiceAdapter;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -74,16 +76,13 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String extractToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(HEADER_STRING);
-        if (bearerToken != null && bearerToken.startsWith(TOKEN_PREFIX)) {
-            return bearerToken.substring(TOKEN_PREFIX.length());
+        String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (bearerToken != null && bearerToken.startsWith(DomainConstants.TOKEN_PREFIX)) {
+            return bearerToken.substring(DomainConstants.TOKEN_PREFIX.length());
         }
         return null;
     }
 
-    public static final String TOKEN_PREFIX = "Bearer ";
-    public static final String HEADER_STRING = "Authorization";
-    public static final String EMPTY_STRING = "";
 
 
 }

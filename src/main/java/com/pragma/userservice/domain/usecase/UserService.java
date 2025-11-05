@@ -11,6 +11,7 @@ import com.pragma.userservice.domain.constants.DomainConstants;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Map;
 
 import static com.pragma.userservice.infraestructure.util.UserValidator.validateCellphone;
 import static com.pragma.userservice.infraestructure.util.UserValidator.validateDocument;
@@ -62,10 +63,19 @@ public record UserService(IUserPersistencePort userPersistencePort,
     }
 
     private Auth setTokenProperties(Auth auth, User user) {
-        auth.setToken(tokenServicePort.generateToken(user.getEmail()));
+        Map<String, Object> userClaims = getClaims(user);
+
+        auth.setToken(tokenServicePort.generateToken(user.getEmail(), userClaims));
         auth.setPassword(null);
         auth.setEmail(null);
         return auth;
+    }
+
+    private Map<String, Object> getClaims(User user) {
+        return Map.of(
+                DomainConstants.KEY_USER_ID, user.getId(),
+                DomainConstants.KEY_ROLE_NAME, user.getRole().name()
+        );
     }
 
     private void validateUser(User userEntity, boolean validateAge) {
