@@ -1,4 +1,4 @@
-package com.pragma.userservice.infraestructure.exception;
+package com.pragma.userservice.infrastructure.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

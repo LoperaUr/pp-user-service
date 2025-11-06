@@ -1,4 +1,4 @@
-package com.pragma.userservice.infraestructure.input.rest;
+package com.pragma.userservice.infrastructure.input.rest;
 
 import com.pragma.userservice.application.dto.AuthDTO;
 import com.pragma.userservice.application.handler.IUserHandler;

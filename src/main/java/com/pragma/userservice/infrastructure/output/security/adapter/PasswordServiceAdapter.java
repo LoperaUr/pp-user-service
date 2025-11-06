@@ -1,4 +1,4 @@
-package com.pragma.userservice.infraestructure.output.security.adapter;
+package com.pragma.userservice.infrastructure.output.security.adapter;
 
 import com.pragma.userservice.domain.api.IPasswordServicePort;
 import lombok.RequiredArgsConstructor;

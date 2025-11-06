@@ -1,11 +1,11 @@
-package com.pragma.userservice.infraestructure.output.jpa.adapter;
+package com.pragma.userservice.infrastructure.output.jpa.adapter;
 
 import com.pragma.userservice.domain.model.Role;
 import com.pragma.userservice.domain.model.User;
 import com.pragma.userservice.domain.spi.IUserPersistencePort;
-import com.pragma.userservice.infraestructure.output.jpa.entity.UserEntity;
-import com.pragma.userservice.infraestructure.output.jpa.mapper.IUserEntityMapper;
-import com.pragma.userservice.infraestructure.output.jpa.repository.IUserRepository;
+import com.pragma.userservice.infrastructure.output.jpa.entity.UserEntity;
+import com.pragma.userservice.infrastructure.output.jpa.mapper.IUserEntityMapper;
+import com.pragma.userservice.infrastructure.output.jpa.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

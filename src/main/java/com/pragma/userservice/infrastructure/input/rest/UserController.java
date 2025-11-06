@@ -1,4 +1,4 @@
-package com.pragma.userservice.infraestructure.input.rest;
+package com.pragma.userservice.infrastructure.input.rest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

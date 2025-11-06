@@ -1,14 +1,22 @@
-package com.pragma.userservice.infraestructure.configuration;
+package com.pragma.userservice.infrastructure.configuration;
 
+import com.pragma.userservice.infrastructure.output.security.helper.CustomAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
+
+    private final CustomAuthenticationFilter customAuthenticationFilter;
+
+    public SecurityConfig(CustomAuthenticationFilter customAuthenticationFilter) {
+        this.customAuthenticationFilter = customAuthenticationFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -23,10 +31,13 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-resources/**",
                                 "/webjars/**",
-                                "/api/public/**"
+                                "/auth/login/**"
                         ).permitAll()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 );
+
+        http.addFilterBefore(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 

@@ -1,4 +1,4 @@
-package com.pragma.userservice.infraestructure.output.jpa.entity;
+package com.pragma.userservice.infrastructure.output.jpa.entity;
 
 import com.pragma.userservice.domain.model.Role;
 import jakarta.persistence.Entity;

@@ -1,9 +1,9 @@
-package com.pragma.userservice.infraestructure.configuration;
+package com.pragma.userservice.infrastructure.configuration;
 
 import com.pragma.userservice.domain.api.IUserServicePort;import com.pragma.userservice.domain.spi.IUserPersistencePort;
 import com.pragma.userservice.domain.usecase.UserService;
-import com.pragma.userservice.infraestructure.output.security.adapter.JwtServiceAdapter;
-import com.pragma.userservice.infraestructure.output.security.adapter.PasswordServiceAdapter;
+import com.pragma.userservice.infrastructure.output.security.adapter.JwtServiceAdapter;
+import com.pragma.userservice.infrastructure.output.security.adapter.PasswordServiceAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

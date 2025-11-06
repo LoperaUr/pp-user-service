@@ -1,4 +1,4 @@
-package com.pragma.userservice.infraestructure.util;
+package com.pragma.userservice.infrastructure.util;
 
 public class UserValidator {
 

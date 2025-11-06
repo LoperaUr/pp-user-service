@@ -1,7 +1,7 @@
-package com.pragma.userservice.infraestructure.output.jpa.mapper;
+package com.pragma.userservice.infrastructure.output.jpa.mapper;
 
 import com.pragma.userservice.domain.model.User;
-import com.pragma.userservice.infraestructure.output.jpa.entity.UserEntity;
+import com.pragma.userservice.infrastructure.output.jpa.entity.UserEntity;
 import jakarta.validation.constraints.NotNull;
 import org.mapstruct.*;
 

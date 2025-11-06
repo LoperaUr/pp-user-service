@@ -1,4 +1,4 @@
-package com.pragma.userservice.infraestructure.output.security.helper;
+package com.pragma.userservice.infrastructure.output.security.helper;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

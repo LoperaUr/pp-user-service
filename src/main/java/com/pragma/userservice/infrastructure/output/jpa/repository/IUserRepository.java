@@ -1,6 +1,6 @@
-package com.pragma.userservice.infraestructure.output.jpa.repository;
+package com.pragma.userservice.infrastructure.output.jpa.repository;
 
-import com.pragma.userservice.infraestructure.output.jpa.entity.UserEntity;
+import com.pragma.userservice.infrastructure.output.jpa.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

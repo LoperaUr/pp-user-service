@@ -5,6 +5,7 @@ public final class ApplicationConstants {
     // Prevent instantiation
     private ApplicationConstants() {}
 
+    // Messages
     public static final String NAME_CANNOT_BE_BLANK = "Name cannot be blank";
     public static final String LAST_NAME_CANNOT_BE_BLANK = "Last name cannot be blank";
     public static final String IDENTIFICATION_NUMBER_CANNOT_BE_BLANK = "Identification number cannot be blank";

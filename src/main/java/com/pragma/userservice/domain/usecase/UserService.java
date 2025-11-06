@@ -13,8 +13,8 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.Map;
 
-import static com.pragma.userservice.infraestructure.util.UserValidator.validateCellphone;
-import static com.pragma.userservice.infraestructure.util.UserValidator.validateDocument;
+import static com.pragma.userservice.infrastructure.util.UserValidator.validateCellphone;
+import static com.pragma.userservice.infrastructure.util.UserValidator.validateDocument;
 
 public record UserService(IUserPersistencePort userPersistencePort,
                           IPasswordServicePort passwordServicePort,
