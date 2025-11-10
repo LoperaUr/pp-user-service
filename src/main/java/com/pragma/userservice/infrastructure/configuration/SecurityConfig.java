@@ -1,5 +1,6 @@
 package com.pragma.userservice.infrastructure.configuration;
 
+import com.pragma.userservice.infrastructure.constants.InfrastructureConstants;
 import com.pragma.userservice.infrastructure.output.security.helper.CustomAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,14 +26,7 @@ public class SecurityConfig {
                 .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html",
-                                "/swagger-resources/**",
-                                "/webjars/**",
-                                "/auth/login/**"
-                        ).permitAll()
+                        .requestMatchers(InfrastructureConstants.getPublicEndpoints().toArray(new String[0])).permitAll()
                         .anyRequest().authenticated()
                 );
 

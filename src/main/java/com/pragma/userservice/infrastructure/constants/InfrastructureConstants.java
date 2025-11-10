@@ -1,5 +1,7 @@
 package com.pragma.userservice.infrastructure.constants;
 
+import java.util.List;
+
 public class InfrastructureConstants {
 
     // Prevent instantiation
@@ -19,5 +21,22 @@ public class InfrastructureConstants {
     public static final String UTF_8 = "UTF-8";
     public static final String EMPTY_STRING = "";
 
+    // Public Endpoints
+    private static final List<String> PUBLIC_ENDPOINTS = List.of(
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-ui.html",
+            "/swagger-resources/**",
+            "/webjars/**",
+            "/auth/login/**",
+            "/actuator/**"
+    );
+
+    /**
+     * Returns the list of public endpoints. These endpoints do not require authentication.
+     */
+    public static List<String> getPublicEndpoints() {
+        return PUBLIC_ENDPOINTS;
+    }
 
 }

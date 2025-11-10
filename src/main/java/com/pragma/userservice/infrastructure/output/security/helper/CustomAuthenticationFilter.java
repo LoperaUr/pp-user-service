@@ -12,10 +12,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +35,22 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
     public CustomAuthenticationFilter(JwtServiceAdapter jwtServiceAdapter, ObjectMapper objectMapper) {
         this.jwtServiceAdapter = jwtServiceAdapter;
         this.objectMapper = objectMapper;
+    }
+
+    private static final RequestMatcher PUBLIC_MATCHER;
+
+    static {
+        ArrayList<RequestMatcher> matchers = new ArrayList<>();
+        for (String endpoint : InfrastructureConstants.getPublicEndpoints()) {
+            matchers.add(new AntPathRequestMatcher(endpoint));
+        }
+        matchers.add(new AntPathRequestMatcher("/**", "OPTIONS"));
+        PUBLIC_MATCHER = new OrRequestMatcher(matchers);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
+        return PUBLIC_MATCHER.matches(request);
     }
 
     @Override
