@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.lenient;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -38,9 +39,9 @@ class UserServiceTest {
     void setUp() {
         validUser = new User(null, "John", "Doe", "123456", "+573000000000",
                 LocalDate.now().minusYears(20), "john@example.com", "raw", null);
-        when(passwordServicePort.encodePassword("raw")).thenReturn("encoded");
-        when(userPersistencePort.findByEmail(any())).thenReturn(Optional.empty());
-        when(userPersistencePort.findByPhoneNumber(any())).thenReturn(Optional.empty());
+        lenient().when(passwordServicePort.encodePassword("raw")).thenReturn("encoded");
+        lenient().when(userPersistencePort.findByEmail(any())).thenReturn(Optional.empty());
+        lenient().when(userPersistencePort.findByPhoneNumber(any())).thenReturn(Optional.empty());
     }
 
     @Test

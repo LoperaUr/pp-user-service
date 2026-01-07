@@ -2,16 +2,23 @@ package com.pragma.userservice.infrastructure.output.security.helper;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.List;
 
 public record JwtAuthentication(Map<String, Object> claims) implements Authentication {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        Object roleName = claims.get("role_name");
+        if (roleName == null) {
+            return Collections.emptyList();
+        }
+        String role = String.valueOf(roleName);
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
     @Override
