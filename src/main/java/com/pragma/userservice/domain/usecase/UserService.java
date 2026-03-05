@@ -3,11 +3,13 @@ package com.pragma.userservice.domain.usecase;
 import com.pragma.userservice.domain.api.IPasswordServicePort;
 import com.pragma.userservice.domain.api.ITokenServicePort;
 import com.pragma.userservice.domain.api.IUserServicePort;
+import com.pragma.userservice.domain.constants.DomainConstants;
+import com.pragma.userservice.domain.exception.DomainException;
 import com.pragma.userservice.domain.model.Auth;
 import com.pragma.userservice.domain.model.Role;
 import com.pragma.userservice.domain.model.User;
 import com.pragma.userservice.domain.spi.IUserPersistencePort;
-import com.pragma.userservice.domain.constants.DomainConstants;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -45,7 +47,7 @@ public record UserService(IUserPersistencePort userPersistencePort,
     @Override
     public User getUserById(Long id) {
         User user = userPersistencePort.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(DomainConstants.MSG_USER_NOT_FOUND));
+                .orElseThrow(() -> new DomainException(DomainConstants.MSG_USER_NOT_FOUND, HttpStatus.NOT_FOUND));
         user.setPassword(null);
         return user;
     }
@@ -53,10 +55,10 @@ public record UserService(IUserPersistencePort userPersistencePort,
     @Override
     public Auth login(Auth auth) {
         User user = userPersistencePort.findByEmail(auth.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException(DomainConstants.MSG_USER_NOT_FOUND));
+                .orElseThrow(() -> new DomainException(DomainConstants.MSG_USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         if (!passwordServicePort.matches(auth.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException(DomainConstants.MSG_INVALID_CREDENTIALS);
+            throw new DomainException(DomainConstants.MSG_INVALID_CREDENTIALS, HttpStatus.UNAUTHORIZED);
         }
 
         return setTokenProperties(auth, user);
@@ -80,19 +82,19 @@ public record UserService(IUserPersistencePort userPersistencePort,
 
     private void validateUser(User userEntity, boolean validateAge) {
         if (!validateCellphone(userEntity.getPhoneNumber())) {
-            throw new IllegalArgumentException(DomainConstants.MSG_INVALID_CELLPHONE);
+            throw new DomainException(DomainConstants.MSG_INVALID_CELLPHONE, HttpStatus.BAD_REQUEST);
         }
         if (!validateDocument(userEntity.getIdentificationNumber())) {
-            throw new IllegalArgumentException(DomainConstants.MSG_INVALID_DOCUMENT);
+            throw new DomainException(DomainConstants.MSG_INVALID_DOCUMENT, HttpStatus.BAD_REQUEST);
         }
         if (validateAge && Period.between(userEntity.getBirthDate(), LocalDate.now()).getYears() < 18) {
-            throw new IllegalArgumentException(DomainConstants.MSG_UNDERAGE_USER);
+            throw new DomainException(DomainConstants.MSG_UNDERAGE_USER, HttpStatus.BAD_REQUEST);
         }
         if (userPersistencePort.findByEmail(userEntity.getEmail()).isPresent()) {
-            throw new IllegalArgumentException(DomainConstants.MSG_EMAIL_ALREADY_EXISTS);
+            throw new DomainException(DomainConstants.MSG_EMAIL_ALREADY_EXISTS, HttpStatus.CONFLICT);
         }
         if (userPersistencePort.findByPhoneNumber(userEntity.getPhoneNumber()).isPresent()) {
-            throw new IllegalArgumentException(DomainConstants.MSG_PHONE_ALREADY_EXISTS);
+            throw new DomainException(DomainConstants.MSG_PHONE_ALREADY_EXISTS, HttpStatus.CONFLICT);
         }
     }
 }

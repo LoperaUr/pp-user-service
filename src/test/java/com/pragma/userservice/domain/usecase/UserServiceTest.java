@@ -2,6 +2,8 @@ package com.pragma.userservice.domain.usecase;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,6 +13,9 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import com.pragma.userservice.domain.api.IPasswordServicePort;
+import com.pragma.userservice.domain.api.ITokenServicePort;
+import com.pragma.userservice.domain.exception.DomainException;
+import com.pragma.userservice.domain.model.Auth;
 import com.pragma.userservice.domain.model.Role;
 import com.pragma.userservice.domain.model.User;
 import com.pragma.userservice.domain.spi.IUserPersistencePort;
@@ -29,6 +34,9 @@ class UserServiceTest {
 
     @Mock
     private IPasswordServicePort passwordServicePort;
+
+    @Mock
+    private ITokenServicePort tokenServicePort;
 
     @InjectMocks
     private UserService userService;
@@ -67,34 +75,34 @@ class UserServiceTest {
     @Test
     void createOwnerInvalidCellphone() {
         validUser.setPhoneNumber("12");
-        assertThrows(IllegalArgumentException.class, () -> userService.createOwner(validUser));
+        assertThrows(DomainException.class, () -> userService.createOwner(validUser));
         verify(userPersistencePort, never()).saveUser(any(), any());
     }
 
     @Test
     void createOwnerInvalidDocument() {
         validUser.setIdentificationNumber("abc");
-        assertThrows(IllegalArgumentException.class, () -> userService.createOwner(validUser));
+        assertThrows(DomainException.class, () -> userService.createOwner(validUser));
         verify(userPersistencePort, never()).saveUser(any(), any());
     }
 
     @Test
     void createOwnerUnderAge() {
         validUser.setBirthDate(LocalDate.now().minusYears(17));
-        assertThrows(IllegalArgumentException.class, () -> userService.createOwner(validUser));
+        assertThrows(DomainException.class, () -> userService.createOwner(validUser));
         verify(userPersistencePort, never()).saveUser(any(), any());
     }
 
     @Test
     void createOwnerEmailExists() {
         when(userPersistencePort.findByEmail(validUser.getEmail())).thenReturn(Optional.of(new User()));
-        assertThrows(IllegalArgumentException.class, () -> userService.createOwner(validUser));
+        assertThrows(DomainException.class, () -> userService.createOwner(validUser));
     }
 
     @Test
     void createOwnerPhoneExists() {
         when(userPersistencePort.findByPhoneNumber(validUser.getPhoneNumber())).thenReturn(Optional.of(new User()));
-        assertThrows(IllegalArgumentException.class, () -> userService.createOwner(validUser));
+        assertThrows(DomainException.class, () -> userService.createOwner(validUser));
     }
 
     @Test
@@ -117,6 +125,53 @@ class UserServiceTest {
     void getUserByIdNotFound() {
         when(userPersistencePort.findById(1L)).thenReturn(Optional.empty());
         
-        assertThrows(IllegalArgumentException.class, () -> userService.getUserById(1L));
+        assertThrows(DomainException.class, () -> userService.getUserById(1L));
+    }
+
+    @Test
+    void loginSuccess() {
+        User storedUser = User.builder()
+                .id(1L)
+                .name("John")
+                .lastName("Doe")
+                .email("john@example.com")
+                .password("encodedPassword")
+                .role(Role.CLIENT)
+                .build();
+
+        when(userPersistencePort.findByEmail("john@example.com")).thenReturn(Optional.of(storedUser));
+        when(passwordServicePort.matches("raw123", "encodedPassword")).thenReturn(true);
+        when(tokenServicePort.generateToken(eq("john@example.com"), anyMap())).thenReturn("jwt-token-123");
+
+        Auth auth = new Auth("john@example.com", "raw123", null);
+        Auth result = userService.login(auth);
+
+        assertEquals("jwt-token-123", result.getToken());
+        assertNull(result.getPassword());
+        assertNull(result.getEmail());
+    }
+
+    @Test
+    void loginUserNotFound() {
+        when(userPersistencePort.findByEmail("unknown@example.com")).thenReturn(Optional.empty());
+
+        Auth auth = new Auth("unknown@example.com", "password", null);
+        assertThrows(DomainException.class, () -> userService.login(auth));
+    }
+
+    @Test
+    void loginInvalidCredentials() {
+        User storedUser = User.builder()
+                .id(1L)
+                .email("john@example.com")
+                .password("encodedPassword")
+                .role(Role.CLIENT)
+                .build();
+
+        when(userPersistencePort.findByEmail("john@example.com")).thenReturn(Optional.of(storedUser));
+        when(passwordServicePort.matches("wrongPassword", "encodedPassword")).thenReturn(false);
+
+        Auth auth = new Auth("john@example.com", "wrongPassword", null);
+        assertThrows(DomainException.class, () -> userService.login(auth));
     }
 }
