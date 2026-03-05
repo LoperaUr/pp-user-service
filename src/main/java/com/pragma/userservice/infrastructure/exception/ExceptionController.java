@@ -1,5 +1,6 @@
 package com.pragma.userservice.infrastructure.exception;
 
+import com.pragma.userservice.domain.exception.DomainException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,10 +24,17 @@ public class ExceptionController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
+    @ExceptionHandler(DomainException.class)
+    public ResponseEntity<Map<String, String>> handleDomainException(DomainException ex) {
         Map<String, String> error = new HashMap<>();
         error.put(KEY_ERROR, ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        return ResponseEntity.status(ex.getHttpStatus()).body(error);
+    }
+
+    @ExceptionHandler(InfrastructureException.class)
+    public ResponseEntity<Map<String, String>> handleInfrastructureException(InfrastructureException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put(KEY_ERROR, ex.getMessage());
+        return ResponseEntity.status(ex.getHttpStatus()).body(error);
     }
 }

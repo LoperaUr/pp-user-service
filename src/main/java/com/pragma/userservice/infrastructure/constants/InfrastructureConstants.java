@@ -16,6 +16,9 @@ public class InfrastructureConstants {
     public static final String MSG_TOKEN_MISSING = "Token is missing or not provided";
     public static final String MSG_TOKEN_EXPIRED = "Token has expired";
     public static final String MSG_TOKEN_INVALID = "Invalid token";
+    public static final String MSG_PASSWORD_NULL_OR_EMPTY = "Password cannot be null or empty";
+    public static final String MSG_PASSWORDS_NULL = "Passwords cannot be null";
+    public static final String MSG_ROLE_NOT_FOUND = "Role not found: ";
 
     // Utils
     public static final String UTF_8 = "UTF-8";
