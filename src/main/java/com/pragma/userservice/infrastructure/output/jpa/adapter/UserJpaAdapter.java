@@ -3,10 +3,15 @@ package com.pragma.userservice.infrastructure.output.jpa.adapter;
 import com.pragma.userservice.domain.model.Role;
 import com.pragma.userservice.domain.model.User;
 import com.pragma.userservice.domain.spi.IUserPersistencePort;
+import com.pragma.userservice.infrastructure.constants.InfrastructureConstants;
+import com.pragma.userservice.infrastructure.exception.InfrastructureException;
+import com.pragma.userservice.infrastructure.output.jpa.entity.RoleEntity;
 import com.pragma.userservice.infrastructure.output.jpa.entity.UserEntity;
 import com.pragma.userservice.infrastructure.output.jpa.mapper.IUserEntityMapper;
+import com.pragma.userservice.infrastructure.output.jpa.repository.IRoleRepository;
 import com.pragma.userservice.infrastructure.output.jpa.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -16,6 +21,7 @@ import java.util.Optional;
 public class UserJpaAdapter implements IUserPersistencePort {
 
     private final IUserRepository userRepository;
+    private final IRoleRepository roleRepository;
     private final IUserEntityMapper userEntityMapper;
 
     @Override
@@ -33,7 +39,9 @@ public class UserJpaAdapter implements IUserPersistencePort {
     @Override
     public void saveUser(User user, Role role) {
         UserEntity entity = userEntityMapper.toEntity(user);
-        entity.setRole(role);
+        RoleEntity roleEntity = roleRepository.findByName(role)
+                .orElseThrow(() -> new InfrastructureException(InfrastructureConstants.MSG_ROLE_NOT_FOUND + role.name(), HttpStatus.INTERNAL_SERVER_ERROR));
+        entity.setRoleEntity(roleEntity);
         userRepository.save(entity);
     }
 
