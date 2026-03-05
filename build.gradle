@@ -65,7 +65,7 @@ jacocoTestReport {
                 html.required = true
         }
         classDirectories.setFrom(
-                fileTree(dir: "build/classes/java/main") {
+                fileTree(layout.buildDirectory.dir("classes/java/main")) {
                         include "com/pragma/userservice/domain/**"
                 }
         )
@@ -74,7 +74,7 @@ jacocoTestReport {
 jacocoTestCoverageVerification {
         dependsOn test
         classDirectories.setFrom(
-                fileTree(dir: "build/classes/java/main") {
+                fileTree(layout.buildDirectory.dir("classes/java/main")) {
                         include "com/pragma/userservice/domain/**"
                 }
         )
