@@ -1,6 +1,8 @@
 package com.pragma.userservice.infrastructure.output.security.adapter;
 
 import com.pragma.userservice.domain.api.ITokenServicePort;
+import com.pragma.userservice.domain.constants.DomainConstants;
+import com.pragma.userservice.domain.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -11,7 +13,6 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -27,14 +28,10 @@ public class JwtServiceAdapter implements ITokenServicePort {
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(String email) {
-        return generateToken(email, new HashMap<>());
-    }
-
-    public String generateToken(String email, Map<String, Object> claims) {
+    public String generateToken(User user) {
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(email)
+                .setClaims(getClaims(user))
+                .setSubject(user.getEmail())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -47,6 +44,14 @@ public class JwtServiceAdapter implements ITokenServicePort {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+
+    private Map<String, Object> getClaims(User user) {
+        return Map.of(
+                DomainConstants.KEY_USER_ID, user.getId(),
+                DomainConstants.KEY_ROLE_NAME, user.getRole().name()
+        );
     }
 
 }

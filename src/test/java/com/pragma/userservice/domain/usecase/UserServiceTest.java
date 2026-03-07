@@ -2,8 +2,6 @@ package com.pragma.userservice.domain.usecase;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -141,7 +139,7 @@ class UserServiceTest {
 
         when(userPersistencePort.findByEmail("john@example.com")).thenReturn(Optional.of(storedUser));
         when(passwordServicePort.matches("raw123", "encodedPassword")).thenReturn(true);
-        when(tokenServicePort.generateToken(eq("john@example.com"), anyMap())).thenReturn("jwt-token-123");
+        when(tokenServicePort.generateToken(any(User.class))).thenReturn("jwt-token-123");
 
         Auth auth = new Auth("john@example.com", "raw123", null);
         Auth result = userService.login(auth);
