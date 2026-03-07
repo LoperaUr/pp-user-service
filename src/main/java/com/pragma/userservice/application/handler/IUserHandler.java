@@ -5,6 +5,8 @@ import com.pragma.userservice.application.dto.UserDTO;
 import jakarta.validation.Valid;
 
 public interface IUserHandler {
+    void createAdmin(@Valid UserDTO userDTO);
+
     void createOwner(@Valid UserDTO userDTO);
 
     void createEmployee(@Valid UserDTO userDTO);

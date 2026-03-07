@@ -24,6 +24,13 @@ public record UserService(IUserPersistencePort userPersistencePort,
                           ) implements IUserServicePort {
 
     @Override
+    public void createAdmin(User userEntity) {
+        userEntity.setPassword(passwordServicePort().encodePassword(userEntity.getPassword()));
+        validateUser(userEntity, true);
+        userPersistencePort.saveUser(userEntity, Role.ADMIN);
+    }
+
+    @Override
     public void createOwner(User userEntity) {
         userEntity.setPassword(passwordServicePort.encodePassword(userEntity.getPassword()));
         validateUser(userEntity, true);

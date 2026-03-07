@@ -13,6 +13,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.function.Consumer;
 
 @Component
 @RequiredArgsConstructor
@@ -28,36 +29,57 @@ public class DefaultDevelopmentRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         initializeRoles();
         createDefaultOwner();
+        createDefaultAdmin();
     }
 
     private void initializeRoles() {
         for (Role role : Role.values()) {
             try {
                 rolePersistencePort.saveRole(role);
-                logger.info("Role initialized: {}", role.name());
             } catch (Exception e) {
                 logger.error("Failed to initialize role {}: {}", role.name(), e.getMessage(), e);
             }
         }
     }
 
-    private void createDefaultOwner() {
-        try {
-            String email = "carlos.perez@example.com";
-            String phone = "3001234567";
+    private void createDefaultAdmin() {
+        createDefaultUser(
+                "admin@example.com",
+                "3001234565",
+                "Admin",
+                userHandler::createAdmin,
+                "ADMIN"
+        );
+    }
 
+    private void createDefaultOwner() {
+        createDefaultUser(
+                "owner@example.com",
+                "3001234567",
+                "Owner",
+                userHandler::createOwner,
+                "OWNER"
+        );
+    }
+
+    private void createDefaultUser(
+            String email,
+            String phone,
+            String firstName,
+            Consumer<UserDTO> creator,
+            String roleLabel
+    ) {
+        try {
             if (userPersistencePort.findByEmail(email).isPresent()) {
-                logger.info("Default owner already exists (email={}) - skipping creation", email);
                 return;
             }
             if (userPersistencePort.findByPhoneNumber(phone).isPresent()) {
-                logger.info("Default owner already exists (phone={}) - skipping creation", phone);
                 return;
             }
 
             UserDTO user = UserDTO.builder()
-                    .name("Carlos")
-                    .lastName("Pérez")
+                    .name(firstName)
+                    .lastName("Sample")
                     .identificationNumber("12345678")
                     .phoneNumber(phone)
                     .birthDate(LocalDate.parse("1990-05-20"))
@@ -65,11 +87,9 @@ public class DefaultDevelopmentRunner implements ApplicationRunner {
                     .password("Secret123!")
                     .build();
 
-            userHandler.createOwner(user);
-            logger.info("Default owner created ({})", email);
+            creator.accept(user);
         } catch (Exception e) {
-            logger.error("Failed to create default owner: {}", e.getMessage(), e);
+            logger.error("Failed to create default {}: {}", roleLabel, e.getMessage(), e);
         }
     }
 }
-

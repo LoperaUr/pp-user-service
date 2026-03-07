@@ -4,6 +4,8 @@ import com.pragma.userservice.domain.model.Auth;
 import com.pragma.userservice.domain.model.User;
 
 public interface IUserServicePort {
+    void createAdmin(User userEntity);
+
     void createOwner(User userEntity);
 
     void createEmployee(User userEntity);
