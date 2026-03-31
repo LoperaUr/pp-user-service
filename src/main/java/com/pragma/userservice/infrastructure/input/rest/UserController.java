@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @PostMapping("/client")
-    @PreAuthorize("permitAll()") // Permitir auto-registro de clientes (HU8)
+    @PreAuthorize("permitAll()")
     public ResponseEntity<Void> createClient(@Valid @RequestBody UserDTO userDTO) {
         userHandler.createClient(userDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
