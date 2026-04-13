@@ -2,27 +2,31 @@ package com.pragma.userservice.domain.usecase;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.lenient;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
 import com.pragma.userservice.domain.api.IPasswordServicePort;
 import com.pragma.userservice.domain.api.ITokenServicePort;
+import com.pragma.userservice.domain.constants.DomainConstants;
 import com.pragma.userservice.domain.exception.DomainException;
 import com.pragma.userservice.domain.model.Auth;
 import com.pragma.userservice.domain.model.Role;
 import com.pragma.userservice.domain.model.User;
 import com.pragma.userservice.domain.spi.IUserPersistencePort;
+import com.pragma.userservice.testdata.builders.AuthBuilder;
+import com.pragma.userservice.testdata.builders.UserBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -40,14 +44,40 @@ class UserServiceTest {
     private UserService userService;
 
     private User validUser;
+    private User storedUser;
+    private Auth authRequest;
 
     @BeforeEach
     void setUp() {
-        validUser = new User(null, "John", "Doe", "123456", "+573000000000",
-                LocalDate.now().minusYears(20), "john@example.com", "raw", null);
+        validUser = UserBuilder.aUser()
+                .withId(null)
+                .withBirthDate(LocalDate.now().minusYears(20))
+                .withPassword("raw")
+                .withRole(null)
+                .build();
+
+        storedUser = UserBuilder.aUser()
+                .withId(1L)
+                .withPassword("encodedPassword")
+                .withRole(Role.CLIENT)
+                .build();
+
+        authRequest = AuthBuilder.anAuth()
+                .withEmail("john@example.com")
+                .withPassword("raw123")
+                .build();
+
         lenient().when(passwordServicePort.encodePassword("raw")).thenReturn("encoded");
         lenient().when(userPersistencePort.findByEmail(any())).thenReturn(Optional.empty());
         lenient().when(userPersistencePort.findByPhoneNumber(any())).thenReturn(Optional.empty());
+    }
+
+    @Test
+    void createAdminSuccess() {
+        userService.createAdmin(validUser);
+
+        assertEquals("encoded", validUser.getPassword());
+        verify(userPersistencePort).saveUser(validUser, Role.ADMIN);
     }
 
     @Test
@@ -73,46 +103,65 @@ class UserServiceTest {
     @Test
     void createOwnerInvalidCellphone() {
         validUser.setPhoneNumber("12");
-        assertThrows(DomainException.class, () -> userService.createOwner(validUser));
+
+        DomainException exception = assertThrows(DomainException.class, () -> userService.createOwner(validUser));
+
+        assertEquals(DomainConstants.MSG_INVALID_CELLPHONE, exception.getMessage());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
         verify(userPersistencePort, never()).saveUser(any(), any());
     }
 
     @Test
     void createOwnerInvalidDocument() {
         validUser.setIdentificationNumber("abc");
-        assertThrows(DomainException.class, () -> userService.createOwner(validUser));
+
+        DomainException exception = assertThrows(DomainException.class, () -> userService.createOwner(validUser));
+
+        assertEquals(DomainConstants.MSG_INVALID_DOCUMENT, exception.getMessage());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
         verify(userPersistencePort, never()).saveUser(any(), any());
     }
 
     @Test
     void createOwnerUnderAge() {
         validUser.setBirthDate(LocalDate.now().minusYears(17));
-        assertThrows(DomainException.class, () -> userService.createOwner(validUser));
+
+        DomainException exception = assertThrows(DomainException.class, () -> userService.createOwner(validUser));
+
+        assertEquals(DomainConstants.MSG_UNDERAGE_USER, exception.getMessage());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
         verify(userPersistencePort, never()).saveUser(any(), any());
     }
 
     @Test
     void createOwnerEmailExists() {
         when(userPersistencePort.findByEmail(validUser.getEmail())).thenReturn(Optional.of(new User()));
-        assertThrows(DomainException.class, () -> userService.createOwner(validUser));
+
+        DomainException exception = assertThrows(DomainException.class, () -> userService.createOwner(validUser));
+
+        assertEquals(DomainConstants.MSG_EMAIL_ALREADY_EXISTS, exception.getMessage());
+        assertEquals(HttpStatus.CONFLICT, exception.getHttpStatus());
     }
 
     @Test
     void createOwnerPhoneExists() {
         when(userPersistencePort.findByPhoneNumber(validUser.getPhoneNumber())).thenReturn(Optional.of(new User()));
-        assertThrows(DomainException.class, () -> userService.createOwner(validUser));
+
+        DomainException exception = assertThrows(DomainException.class, () -> userService.createOwner(validUser));
+
+        assertEquals(DomainConstants.MSG_PHONE_ALREADY_EXISTS, exception.getMessage());
+        assertEquals(HttpStatus.CONFLICT, exception.getHttpStatus());
     }
 
     @Test
     void getUserByIdRemovesPassword() {
-        User userWithPassword = User.builder()
-                .id(1L)
-                .name("John")
-                .lastName("Doe")
-                .password("secretPassword")
+        User userWithPassword = UserBuilder.aUser()
+                .withId(1L)
+                .withPassword("secretPassword")
                 .build();
+
         when(userPersistencePort.findById(1L)).thenReturn(Optional.of(userWithPassword));
-        
+
         User result = userService.getUserById(1L);
 
         assertNull(result.getPassword());
@@ -122,27 +171,20 @@ class UserServiceTest {
     @Test
     void getUserByIdNotFound() {
         when(userPersistencePort.findById(1L)).thenReturn(Optional.empty());
-        
-        assertThrows(DomainException.class, () -> userService.getUserById(1L));
+
+        DomainException exception = assertThrows(DomainException.class, () -> userService.getUserById(1L));
+
+        assertEquals(DomainConstants.MSG_USER_NOT_FOUND, exception.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
     }
 
     @Test
     void loginSuccess() {
-        User storedUser = User.builder()
-                .id(1L)
-                .name("John")
-                .lastName("Doe")
-                .email("john@example.com")
-                .password("encodedPassword")
-                .role(Role.CLIENT)
-                .build();
-
         when(userPersistencePort.findByEmail("john@example.com")).thenReturn(Optional.of(storedUser));
         when(passwordServicePort.matches("raw123", "encodedPassword")).thenReturn(true);
-        when(tokenServicePort.generateToken(any(User.class))).thenReturn("jwt-token-123");
+        when(tokenServicePort.generateToken(storedUser)).thenReturn("jwt-token-123");
 
-        Auth auth = new Auth("john@example.com", "raw123", null);
-        Auth result = userService.login(auth);
+        Auth result = userService.login(authRequest);
 
         assertEquals("jwt-token-123", result.getToken());
         assertNull(result.getPassword());
@@ -153,23 +195,30 @@ class UserServiceTest {
     void loginUserNotFound() {
         when(userPersistencePort.findByEmail("unknown@example.com")).thenReturn(Optional.empty());
 
-        Auth auth = new Auth("unknown@example.com", "password", null);
-        assertThrows(DomainException.class, () -> userService.login(auth));
+        Auth auth = AuthBuilder.anAuth()
+                .withEmail("unknown@example.com")
+                .withPassword("password")
+                .build();
+
+        DomainException exception = assertThrows(DomainException.class, () -> userService.login(auth));
+
+        assertEquals(DomainConstants.MSG_USER_NOT_FOUND, exception.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
     }
 
     @Test
     void loginInvalidCredentials() {
-        User storedUser = User.builder()
-                .id(1L)
-                .email("john@example.com")
-                .password("encodedPassword")
-                .role(Role.CLIENT)
-                .build();
-
         when(userPersistencePort.findByEmail("john@example.com")).thenReturn(Optional.of(storedUser));
         when(passwordServicePort.matches("wrongPassword", "encodedPassword")).thenReturn(false);
 
-        Auth auth = new Auth("john@example.com", "wrongPassword", null);
-        assertThrows(DomainException.class, () -> userService.login(auth));
+        Auth auth = AuthBuilder.anAuth()
+                .withEmail("john@example.com")
+                .withPassword("wrongPassword")
+                .build();
+
+        DomainException exception = assertThrows(DomainException.class, () -> userService.login(auth));
+
+        assertEquals(DomainConstants.MSG_INVALID_CREDENTIALS, exception.getMessage());
+        assertEquals(HttpStatus.UNAUTHORIZED, exception.getHttpStatus());
     }
 }
