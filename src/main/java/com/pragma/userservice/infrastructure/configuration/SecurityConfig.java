@@ -1,9 +1,9 @@
 package com.pragma.userservice.infrastructure.configuration;
 
-import com.pragma.userservice.infrastructure.constants.InfrastructureConstants;
 import com.pragma.userservice.infrastructure.output.security.helper.CustomAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -28,8 +28,11 @@ public class SecurityConfig {
                 .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(InfrastructureConstants.getPublicEndpoints().toArray(new String[0])).permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers(HttpMethod.POST, "/users/owner").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/users/employee").hasRole("OWNER")
+                        .requestMatchers(HttpMethod.POST, "/users/client").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users/**").authenticated()
+                        .anyRequest().permitAll()
                 );
 
         http.addFilterBefore(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
