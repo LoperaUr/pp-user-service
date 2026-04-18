@@ -14,8 +14,8 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDate;
 import java.time.Period;
 
-import static com.pragma.userservice.infrastructure.util.UserValidator.validateCellphone;
-import static com.pragma.userservice.infrastructure.util.UserValidator.validateDocument;
+import static com.pragma.userservice.domain.util.UserValidator.validateCellphone;
+import static com.pragma.userservice.domain.util.UserValidator.validateDocument;
 
 public record UserService(IUserPersistencePort userPersistencePort,
                           IPasswordServicePort passwordServicePort,
