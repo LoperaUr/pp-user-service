@@ -12,7 +12,7 @@ Microservicio encargado de autenticacion y gestion de usuarios (owner, employee 
 | HU | Endpoint / Regla | Estado | Evidencia en el repo |
 |---|---|---|---|
 | #1 | Crear propietario (ADMIN) | Implementada | `POST /users/owner` en `UserController` |
-| #5 | Autenticacion y autorizacion por rol | Parcial | `POST /auth/login` en `AuthController` y `@PreAuthorize` en endpoints de `UserController` |
+| #5 | Autenticacion y autorizacion por rol | Implementada | `POST /auth/login` en `AuthController` y `@PreAuthorize` en endpoints de `UserController` |
 | #6 | Crear empleado (OWNER) | Implementada | `POST /users/employee` en `UserController` |
 | #8 | Crear cliente | Implementada | `POST /users/client` en `UserController` |
 | Soporte interno | Obtener usuario por id | Implementada | `GET /users/{id}` en `UserController` |
