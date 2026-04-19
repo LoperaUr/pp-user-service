@@ -8,6 +8,8 @@ import com.pragma.userservice.domain.exception.DomainException;
 import com.pragma.userservice.domain.model.Auth;
 import com.pragma.userservice.domain.model.Role;
 import com.pragma.userservice.domain.model.User;
+import com.pragma.userservice.domain.spi.IAuthenticationServicePort;
+import com.pragma.userservice.domain.spi.IRestaurantAssignmentPort;
 import com.pragma.userservice.domain.spi.IUserPersistencePort;
 import org.springframework.http.HttpStatus;
 
@@ -19,7 +21,9 @@ import static com.pragma.userservice.domain.util.UserValidator.validateDocument;
 
 public record UserService(IUserPersistencePort userPersistencePort,
                           IPasswordServicePort passwordServicePort,
-                          ITokenServicePort tokenServicePort
+                          ITokenServicePort tokenServicePort,
+                          IAuthenticationServicePort authenticationServicePort,
+                          IRestaurantAssignmentPort restaurantAssignmentPort
                           ) implements IUserServicePort {
 
     @Override
@@ -38,9 +42,18 @@ public record UserService(IUserPersistencePort userPersistencePort,
 
     @Override
     public void createEmployee(User userEntity) {
+        Long ownerId = authenticationServicePort.getAuthenticatedUserId()
+                .orElseThrow(() -> new DomainException(DomainConstants.MSG_AUTHENTICATED_USER_NOT_FOUND, HttpStatus.UNAUTHORIZED));
+
         userEntity.setPassword(passwordServicePort.encodePassword(userEntity.getPassword()));
         validateUser(userEntity, false);
         userPersistencePort.saveUser(userEntity, Role.EMPLOYEE);
+
+        Long employeeId = userPersistencePort.findByEmail(userEntity.getEmail())
+                .map(User::getId)
+                .orElseThrow(() -> new DomainException(DomainConstants.MSG_USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        restaurantAssignmentPort.assignEmployeeToOwnerRestaurant(ownerId, employeeId);
     }
 
     @Override

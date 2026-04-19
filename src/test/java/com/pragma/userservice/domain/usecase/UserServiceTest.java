@@ -17,6 +17,8 @@ import com.pragma.userservice.domain.exception.DomainException;
 import com.pragma.userservice.domain.model.Auth;
 import com.pragma.userservice.domain.model.Role;
 import com.pragma.userservice.domain.model.User;
+import com.pragma.userservice.domain.spi.IAuthenticationServicePort;
+import com.pragma.userservice.domain.spi.IRestaurantAssignmentPort;
 import com.pragma.userservice.domain.spi.IUserPersistencePort;
 import com.pragma.userservice.testdata.builders.AuthBuilder;
 import com.pragma.userservice.testdata.builders.UserBuilder;
@@ -39,6 +41,12 @@ class UserServiceTest {
 
     @Mock
     private ITokenServicePort tokenServicePort;
+
+    @Mock
+    private IAuthenticationServicePort authenticationServicePort;
+
+    @Mock
+    private IRestaurantAssignmentPort restaurantAssignmentPort;
 
     @InjectMocks
     private UserService userService;
@@ -89,8 +97,16 @@ class UserServiceTest {
 
     @Test
     void createEmployeeSuccess() {
+        User savedEmployee = UserBuilder.aUser().withId(99L).build();
+        when(authenticationServicePort.getAuthenticatedUserId()).thenReturn(Optional.of(10L));
+        when(userPersistencePort.findByEmail(validUser.getEmail()))
+                .thenReturn(Optional.empty())
+                .thenReturn(Optional.of(savedEmployee));
+
         userService.createEmployee(validUser);
+
         verify(userPersistencePort).saveUser(validUser, Role.EMPLOYEE);
+        verify(restaurantAssignmentPort).assignEmployeeToOwnerRestaurant(10L, 99L);
     }
 
     @Test

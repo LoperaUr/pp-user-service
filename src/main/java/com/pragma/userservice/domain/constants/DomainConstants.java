@@ -13,6 +13,8 @@ public final class DomainConstants {
     public static final String MSG_EMAIL_ALREADY_EXISTS = "Email already exists";
     public static final String MSG_PHONE_ALREADY_EXISTS = "Phone number already exists";
     public static final String MSG_INVALID_CREDENTIALS = "Invalid credentials";
+    public static final String MSG_AUTHENTICATED_USER_NOT_FOUND = "Authenticated user not found";
+    public static final String MSG_EMPLOYEE_RESTAURANT_ASSIGNMENT_FAILED = "Employee could not be assigned to owner restaurant";
 
     // Key Names
     public static final String KEY_USER_ID = "user_id";

@@ -1,6 +1,9 @@
 package com.pragma.userservice.infrastructure.configuration;
 
-import com.pragma.userservice.domain.api.IUserServicePort;import com.pragma.userservice.domain.spi.IUserPersistencePort;
+import com.pragma.userservice.domain.api.IUserServicePort;
+import com.pragma.userservice.domain.spi.IAuthenticationServicePort;
+import com.pragma.userservice.domain.spi.IRestaurantAssignmentPort;
+import com.pragma.userservice.domain.spi.IUserPersistencePort;
 import com.pragma.userservice.domain.usecase.UserService;
 import com.pragma.userservice.infrastructure.output.security.adapter.JwtServiceAdapter;
 import com.pragma.userservice.infrastructure.output.security.adapter.PasswordServiceAdapter;
@@ -15,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class BeanConfiguration {
 
     private final IUserPersistencePort userPersistencePort;
+    private final IAuthenticationServicePort authenticationServicePort;
+    private final IRestaurantAssignmentPort restaurantAssignmentPort;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -33,6 +38,12 @@ public class BeanConfiguration {
 
     @Bean
     public IUserServicePort userServicePort(PasswordServiceAdapter passwordServiceAdapter) {
-        return new UserService(userPersistencePort, passwordServiceAdapter, jwtServiceAdapter());
+        return new UserService(
+                userPersistencePort,
+                passwordServiceAdapter,
+                jwtServiceAdapter(),
+                authenticationServicePort,
+                restaurantAssignmentPort
+        );
     }
 }
