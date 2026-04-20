@@ -1,7 +1,7 @@
 package com.pragma.userservice.infrastructure.configuration;
 
 import com.pragma.userservice.domain.api.IUserServicePort;
-import com.pragma.userservice.domain.spi.IAuthenticationServicePort;
+import com.pragma.userservice.domain.api.IAuthenticationServicePort;
 import com.pragma.userservice.domain.spi.IRestaurantAssignmentPort;
 import com.pragma.userservice.domain.spi.IUserPersistencePort;
 import com.pragma.userservice.domain.usecase.UserService;

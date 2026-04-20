@@ -1,7 +1,7 @@
 package com.pragma.userservice.infrastructure.output.security.adapter;
 
 import com.pragma.userservice.domain.constants.DomainConstants;
-import com.pragma.userservice.domain.spi.IAuthenticationServicePort;
+import com.pragma.userservice.domain.api.IAuthenticationServicePort;
 import com.pragma.userservice.infrastructure.output.security.helper.JwtAuthentication;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

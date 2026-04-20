@@ -8,7 +8,7 @@ import com.pragma.userservice.domain.exception.DomainException;
 import com.pragma.userservice.domain.model.Auth;
 import com.pragma.userservice.domain.model.Role;
 import com.pragma.userservice.domain.model.User;
-import com.pragma.userservice.domain.spi.IAuthenticationServicePort;
+import com.pragma.userservice.domain.api.IAuthenticationServicePort;
 import com.pragma.userservice.domain.spi.IRestaurantAssignmentPort;
 import com.pragma.userservice.domain.spi.IUserPersistencePort;
 import org.springframework.http.HttpStatus;

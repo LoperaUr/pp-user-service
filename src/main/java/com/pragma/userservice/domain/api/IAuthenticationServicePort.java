@@ -1,4 +1,4 @@
-package com.pragma.userservice.domain.spi;
+package com.pragma.userservice.domain.api;
 
 import java.util.Optional;
 
